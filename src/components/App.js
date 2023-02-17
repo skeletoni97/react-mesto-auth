@@ -1,10 +1,11 @@
-import React, { useEffect, useDebugValue, useState } from "react";
+import React, { useEffect, useDebugValue, useState, useCallback } from "react";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import { api } from "../utils/Api";
+import { apiAuth } from "../utils/ApiAuth";
 import {
   CurrentUserContext,
   CurrentCardsContext,
@@ -13,6 +14,11 @@ import {
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
+import { BrowserRouter, Route, Routes, Redirect, useNavigate } from 'react-router-dom'
+import Login from './Login';
+import Register from "./Register";
+import InfpToolTip from './InfpToolTip';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
@@ -26,6 +32,10 @@ function App() {
 
   const [linkImg, setLinkImg] = React.useState("");
   const [nameImg, setNameImg] = React.useState("");
+  
+  const [isLogin, setIsLogin] = useState (false);
+  const [isEmail, setIsEmail] = useState ('')
+  const navigate = useNavigate();
 
   function handleCardDelete(card) {
     api
@@ -124,25 +134,66 @@ function App() {
       .catch();
   }
 
+
+  function handleAutorizUser (email, paswsord, callback){
+    console.log(email, paswsord);
+    apiAuth.authorization(email, paswsord)
+    .then((res)=>{
+      console.log(res)
+        localStorage.setItem(res.token);
+        console.log(res);
+        setIsLogin(true)
+        callback(true);
+      })
+    .catch((err)=>{
+      console.log(err);
+      callback(false, err);
+    })
+  
+  }
+  
+  //Проверяем токен
+  
+  function handleTokenCheck (){
+    console.log('api reg')
+  if (localStorage.getItem('token')){
+    let jwt = localStorage.getItem('token')
+    apiAuth.checkTokenUser(jwt).then ((res)=>{
+      if(res){
+        setIsEmail(res.data.email)
+        console.log(res);
+        setIsLogin(true)
+        navigate('/')
+        console.log('api')
+        return true
+      } else{
+        navigate('/sign-in')
+        setIsLogin(false)
+      }
+    })
+  }
+  }
   return (
     <>
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <CurrentCardsContext.Provider value={cards}>
             <Header />
-            {/* <Routes>
-              <Route path='/sign-up' element ={<Register onRegistr= {handleRegistr} />}/>
-              <Route path='sign-in' element={<SignIn onSignin ={handleAutorizUser}/>}/>
+            <Routes>
+            <Route  path="/"  element ={<ProtectedRoute loggedIn={isLogin} component={Main}
+                element ={<Main
+                onEditProfile={handleEditProfileClick}
+                onEditAvatar={handleEditAvatarClick}
+                onAddPlace={handleAddPlaceClick}
+                onImg={handleCardClick}
+                onLike={handleCardLike}
+                onDelete={handleCardDelete}
+              ></Main>}/>}/>
+              <Route path='/sign-up' element ={<Register onRegistr = {handleTokenCheck} />}/>
+              <Route path='/sign-in' element={<Login onSignin = {handleAutorizUser}/>}/>
               <Route path='menu' element={<InfpToolTip/>} />
-            </Routes> */}
-            <Main
-              onEditProfile={handleEditProfileClick}
-              onEditAvatar={handleEditAvatarClick}
-              onAddPlace={handleAddPlaceClick}
-              onImg={handleCardClick}
-              onLike={handleCardLike}
-              onDelete={handleCardDelete}
-            ></Main>
+            </Routes>
+          
             <EditProfilePopup
               onUpdateUser={handleUpdateUser}
               isOpen={isEditProfilePopupOpen}

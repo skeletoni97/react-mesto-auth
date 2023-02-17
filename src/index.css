@@ -50,3 +50,9 @@
 
 @import url(./blocks/form-error/form-error.css);
 @import url(./blocks/popup/__button-save/_Disabled/popup__button_disabled.css); 
+
+@import url(./blocks/register/register.css);
+@import url(./blocks/form-register/form-register.css);
+@import url(./blocks/register/__text/register__text.css);
+@import url(./blocks/form-register/__button/form-register__button.css);
+@import url(./blocks/form-register/___input/form-register__input.css);
