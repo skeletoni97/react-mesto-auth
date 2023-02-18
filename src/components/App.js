@@ -14,7 +14,7 @@ import {
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import { BrowserRouter, Route, Routes, Redirect, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Redirect, Navigate, useNavigate, Switch} from 'react-router-dom'
 import Login from './Login';
 import Register from "./Register";
 import InfpToolTip from './InfpToolTip';
@@ -67,6 +67,7 @@ function App() {
   }
 
   useEffect(() => {
+    handleTokenCheck();
     Promise.all([api.getProfile(), api.getInitialCards()])
       .then(([res, items]) => {
         setcurrentUser(res);
@@ -140,7 +141,7 @@ function App() {
     apiAuth.authorization(email, paswsord)
     .then((res)=>{
       console.log(res)
-        localStorage.setItem(res.token);
+        localStorage.setItem('token', res.token);
         console.log(res);
         setIsLogin(true)
         callback(true);
@@ -151,34 +152,36 @@ function App() {
     })
   
   }
-  
+
   //Проверяем токен
   
-  function handleTokenCheck (){
-    console.log('api reg')
-  if (localStorage.getItem('token')){
-    let jwt = localStorage.getItem('token')
-    apiAuth.checkTokenUser(jwt).then ((res)=>{
-      if(res){
-        setIsEmail(res.data.email)
-        console.log(res);
-        setIsLogin(true)
-        navigate('/')
-        console.log('api')
-        return true
-      } else{
-        navigate('/sign-in')
-        setIsLogin(false)
-      }
-    })
-  }
+  function handleTokenCheck() {
+    if (localStorage.getItem('token')) {
+      const jwt = localStorage.getItem('token')
+      apiAuth.checkTokenUser(jwt).then((res) => {
+        if (res) {
+          
+          console.log(res);
+          setIsEmail(res.data.email)
+          setIsLogin(true)
+          navigate('/')
+          return true
+        } else {
+          navigate('/sign-in')
+          setIsLogin(false)
+        }
+      })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
   }
   return (
     <>
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <CurrentCardsContext.Provider value={cards}>
-            <Header />
+            <Header email={isEmail}/>
             <Routes>
             <Route  path="/"  element ={<ProtectedRoute loggedIn={isLogin} component={Main}
                 element ={<Main
@@ -189,9 +192,9 @@ function App() {
                 onLike={handleCardLike}
                 onDelete={handleCardDelete}
               ></Main>}/>}/>
-              <Route path='/sign-up' element ={<Register onRegistr = {handleTokenCheck} />}/>
-              <Route path='/sign-in' element={<Login onSignin = {handleAutorizUser}/>}/>
-              <Route path='menu' element={<InfpToolTip/>} />
+              <Route path='/sign-up' element ={isLogin ? <Navigate to="/" /> :<Register onRegistr={handleTokenCheck} />}/>
+              
+              <Route path='/sign-in' element={isLogin ? <Navigate to="/" /> :<Login onSignin={handleAutorizUser} onRegistr={handleTokenCheck}/>}/>
             </Routes>
           
             <EditProfilePopup

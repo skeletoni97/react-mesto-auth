@@ -1,8 +1,27 @@
 import React from "react";
 import {useState} from 'react'
+import { apiAuth } from "../utils/ApiAuth";
+import {Link, useNavigate} from 'react-router-dom';
 function Register (props){
     const [email, setIsEmail] = useState('')
     const [password, setIsPassword] = useState('')
+
+    const navigate = useNavigate();
+
+    function handleRegistr(email, password) {
+        apiAuth.postUser(email, password)
+            .then((res) => {
+                console.log(res);
+                navigate('/sign-in')
+            })
+            .catch((err) => {
+                
+                console.log(err);
+
+            })
+        console.log(email,'asd');
+        console.log(password);
+    }
 
     function handleSetEmail(e) {
         setIsEmail(e.target.value)
@@ -16,8 +35,8 @@ function Register (props){
 
     function handleSubmit (e){
         e.preventDefault()
-        props.onRegistr(email, password)
-        console.log('fff')
+        handleRegistr(email, password)
+        
         
     }
 

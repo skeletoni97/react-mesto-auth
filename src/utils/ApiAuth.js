@@ -4,7 +4,9 @@ class ApiAuth {
       this._baseUrl = baseUrl;
     }
     postUser(email, password) {
+      console.log(email, password)
         return fetch(`${this._baseUrl}/signup`, {
+          
           method: 'POST',
           headers: this._headers,
           body: JSON.stringify({
@@ -20,10 +22,7 @@ class ApiAuth {
         return fetch(`${this._baseUrl}/signin`, {
           method: 'POST',
           headers: this._headers,
-          body: JSON.stringify({
-            "password": `${password}`,
-            "email": `${email}` 
-          })
+          body: JSON.stringify({ email, password }),
         }
         )
         .then(this._checkResponse)
@@ -45,19 +44,18 @@ class ApiAuth {
       }
 
       _checkResponse(res) {
-        if (res.ok) {
+        if (!res.ok) {
+            return Promise.reject(`Error: ${res.status}`);
+          }
           return res.json();
-        } else {
-          return Promise.reject(`Ошибка:${res.status} ${res.statusText}`);
         }
-      }
 
   
 
   }
   
   export const apiAuth  = new ApiAuth({
-    baseUrl: "https://auth.nomoreparties.co/",
+    baseUrl: 'https://auth.nomoreparties.co',
     headers: {
         "Content-Type": "application/json" 
     },

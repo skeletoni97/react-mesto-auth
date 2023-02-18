@@ -1,6 +1,6 @@
 import React from "react";
 
-import {useState} from 'react'
+import { useState } from 'react'
 function Login (props){
     const [email, setIsEmail] = useState('')
     const [password, setIsPassword] = useState('')
@@ -10,6 +10,8 @@ function Login (props){
         setIsEmail(e.target.value)
         console.log(email);
     }
+
+   
 
     function handleSetPassword(e) {
         setIsPassword(e.target.value)
