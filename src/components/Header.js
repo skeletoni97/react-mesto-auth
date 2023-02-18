@@ -1,18 +1,38 @@
-// import { useHistory } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+
 import React from 'react';
 
 function Header(props) {
-  // const history = useHistory();
-  // const handleSignOut = () => {
-  //   localStorage.removeItem('jwt');
-  //   history.replace('/');
-  // };
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    props.login(false);
+    navigate('/');
+  };
+
+  console.log(props.email, "ff");
 
   return (
     <header className="header">
       <div className="header__logo"></div>
-      <button className='header__button'><a href='/sign-up'>{props.email}</a></button>
-      <button  className='header__button'>выход</button>
+      {props.loggedIn ? (
+        <div className="header__nav">
+          <p className="header__email">{props.email}</p>
+          <Link className="header__button" to="/sign-in" onClick={handleSignOut}>
+            Выйти
+          </Link>
+        </div>
+      ) : location.pathname === "/sign-up" ? (
+        <Link className="header__button" to="/sign-in" onClick={handleSignOut}>
+          Войти
+        </Link>
+      ) : (
+        <Link className="header__button" to="/sign-up" onClick={handleSignOut}>
+          Регистрация
+        </Link>
+      )}
     </header>
   );
 }

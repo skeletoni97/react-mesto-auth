@@ -34,7 +34,9 @@ function App() {
   const [nameImg, setNameImg] = React.useState("");
   
   const [isLogin, setIsLogin] = useState (false);
-  const [isEmail, setIsEmail] = useState ('')
+  const [isEmail, setIsEmail] = useState ('');
+  const [isFail, setIsFail] = useState (false);
+  const [isSuccess, setSuccess] = useState (false);
   const navigate = useNavigate();
 
   function handleCardDelete(card) {
@@ -136,23 +138,32 @@ function App() {
   }
 
 
-  function handleAutorizUser (email, paswsord, callback){
+  function handleAutorizUser (email, paswsord){
     console.log(email, paswsord);
     apiAuth.authorization(email, paswsord)
     .then((res)=>{
-      console.log(res)
         localStorage.setItem('token', res.token);
-        console.log(res);
         setIsLogin(true)
-        callback(true);
       })
     .catch((err)=>{
-      console.log(err);
-      callback(false, err);
     })
   
   }
 
+  function handleRegistr(email, password) {
+    apiAuth
+      .postUser(email, password)
+      .then((res) => {
+        navigate("/sign-in");
+        setSuccess(true); 
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsFail(true);
+      });
+    console.log(email, "asd");
+    console.log(password);
+  }
   //Проверяем токен
   
   function handleTokenCheck() {
@@ -160,8 +171,6 @@ function App() {
       const jwt = localStorage.getItem('token')
       apiAuth.checkTokenUser(jwt).then((res) => {
         if (res) {
-          
-          console.log(res);
           setIsEmail(res.data.email)
           setIsLogin(true)
           navigate('/')
@@ -176,23 +185,34 @@ function App() {
         })
     }
   }
+
+  function closeResponsePopup() {
+    if (isSuccess) {
+      setSuccess(false);
+      navigate('/sign-in', { replace: true }); 
+    } else {
+      setIsFail(false);
+    }
+  }
   return (
     <>
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <CurrentCardsContext.Provider value={cards}>
-            <Header email={isEmail}/>
+            <Header email={isEmail} loggedIn={isLogin} login = {setIsLogin}/>
             <Routes>
-            <Route  path="/"  element ={<ProtectedRoute loggedIn={isLogin} component={Main}
-                element ={<Main
+            <Route  path="/"  element ={<ProtectedRoute loggedIn={isLogin}
                 onEditProfile={handleEditProfileClick}
                 onEditAvatar={handleEditAvatarClick}
                 onAddPlace={handleAddPlaceClick}
                 onImg={handleCardClick}
                 onLike={handleCardLike}
-                onDelete={handleCardDelete}
+                onDelete={handleCardDelete}component={Main}
+                element ={<Main
+            
               ></Main>}/>}/>
-              <Route path='/sign-up' element ={isLogin ? <Navigate to="/" /> :<Register onRegistr={handleTokenCheck} />}/>
+              
+              <Route path='/sign-up' element ={isLogin ? <Navigate to="/" /> :<Register handleRegistr={handleRegistr} onRegistr={handleTokenCheck} />}/>
               
               <Route path='/sign-in' element={isLogin ? <Navigate to="/" /> :<Login onSignin={handleAutorizUser} onRegistr={handleTokenCheck}/>}/>
             </Routes>
@@ -222,6 +242,7 @@ function App() {
               isOpen={isImagePopupOpen}
               closeAllPopups={closeAllPopups}
             />
+            <InfpToolTip isSuccess={isSuccess}  isFail={isFail} onClose={closeResponsePopup} />
 
             <Footer />
           </CurrentCardsContext.Provider>

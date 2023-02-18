@@ -4,8 +4,7 @@ import { useState } from 'react'
 function Login (props){
     const [email, setIsEmail] = useState('')
     const [password, setIsPassword] = useState('')
-    const [osOpen, setIsOpen] = useState('')
-
+ 
     function handleSetEmail(e) {
         setIsEmail(e.target.value)
         console.log(email);
@@ -20,11 +19,7 @@ function Login (props){
 
     function handleSubmit (e){
         e.preventDefault()
-        props.onSignin(email, password, (success, err) => {
-            if(!success) {
-                setIsOpen(true);
-            }
-        })
+        props.onSignin(email, password)
         console.log('ddds')
         
     }
