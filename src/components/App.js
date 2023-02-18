@@ -14,11 +14,19 @@ import {
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import { BrowserRouter, Route, Routes, Redirect, Navigate, useNavigate, Switch} from 'react-router-dom'
-import Login from './Login';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Redirect,
+  Navigate,
+  useNavigate,
+  Switch,
+} from "react-router-dom";
+import Login from "./Login";
 import Register from "./Register";
-import InfpToolTip from './InfpToolTip';
-import ProtectedRoute from './ProtectedRoute';
+import InfpToolTip from "./InfpToolTip";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
@@ -32,11 +40,11 @@ function App() {
 
   const [linkImg, setLinkImg] = React.useState("");
   const [nameImg, setNameImg] = React.useState("");
-  
-  const [isLogin, setIsLogin] = useState (false);
-  const [isEmail, setIsEmail] = useState ('');
-  const [isFail, setIsFail] = useState (false);
-  const [isSuccess, setSuccess] = useState (false);
+
+  const [isLogin, setIsLogin] = useState(false);
+  const [isEmail, setIsEmail] = useState("");
+  const [isFail, setIsFail] = useState(false);
+  const [isSuccess, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   function handleCardDelete(card) {
@@ -51,20 +59,25 @@ function App() {
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    console.log(isLiked);
     // Отправляем запрос в API и получаем обновлённые данные карточки
     if (isLiked !== true) {
-      api.addLike(card._id, !isLiked).then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
-        )
-      }).catch();
+      api
+        .addLike(card._id, !isLiked)
+        .then((newCard) => {
+          setCards((state) =>
+            state.map((c) => (c._id === card._id ? newCard : c))
+          );
+        })
+        .catch();
     } else {
-      api.deleteLike(card._id, !isLiked).then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
-        );
-      }).catch();
+      api
+        .deleteLike(card._id, !isLiked)
+        .then((newCard) => {
+          setCards((state) =>
+            state.map((c) => (c._id === card._id ? newCard : c))
+          );
+        })
+        .catch();
     }
   }
 
@@ -115,12 +128,10 @@ function App() {
   }
 
   function handleUpdateAvatar(data) {
-    console.log(data);
     api
       .updateAvatar(data)
       .then((res) => {
         closeAllPopups();
-        console.log(res);
         setcurrentUser(res);
       })
       .catch();
@@ -130,24 +141,20 @@ function App() {
     api
       .addCard(data)
       .then((newCard) => {
-        console.log(data);
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
       .catch();
   }
 
-
-  function handleAutorizUser (email, paswsord){
-    console.log(email, paswsord);
-    apiAuth.authorization(email, paswsord)
-    .then((res)=>{
-        localStorage.setItem('token', res.token);
-        setIsLogin(true)
+  function handleAutorizUser(email, paswsord) {
+    apiAuth
+      .authorization(email, paswsord)
+      .then((res) => {
+        localStorage.setItem("token", res.token);
+        setIsLogin(true);
       })
-    .catch((err)=>{
-    })
-  
+      .catch((err) => {});
   }
 
   function handleRegistr(email, password) {
@@ -155,41 +162,41 @@ function App() {
       .postUser(email, password)
       .then((res) => {
         navigate("/sign-in");
-        setSuccess(true); 
+        setSuccess(true);
       })
       .catch((err) => {
         console.log(err);
         setIsFail(true);
       });
-    console.log(email, "asd");
-    console.log(password);
   }
   //Проверяем токен
-  
+
   function handleTokenCheck() {
-    if (localStorage.getItem('token')) {
-      const jwt = localStorage.getItem('token')
-      apiAuth.checkTokenUser(jwt).then((res) => {
-        if (res) {
-          setIsEmail(res.data.email)
-          setIsLogin(true)
-          navigate('/')
-          return true
-        } else {
-          navigate('/sign-in')
-          setIsLogin(false)
-        }
-      })
+    if (localStorage.getItem("token")) {
+      const jwt = localStorage.getItem("token");
+      apiAuth
+        .checkTokenUser(jwt)
+        .then((res) => {
+          if (res) {
+            setIsEmail(res.data.email);
+            setIsLogin(true);
+            navigate("/");
+            return true;
+          } else {
+            navigate("/sign-in");
+            setIsLogin(false);
+          }
+        })
         .catch((err) => {
           console.log(err);
-        })
+        });
     }
   }
 
   function closeResponsePopup() {
     if (isSuccess) {
       setSuccess(false);
-      navigate('/sign-in', { replace: true }); 
+      navigate("/sign-in", { replace: true });
     } else {
       setIsFail(false);
     }
@@ -199,24 +206,54 @@ function App() {
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <CurrentCardsContext.Provider value={cards}>
-            <Header email={isEmail} loggedIn={isLogin} login = {setIsLogin}/>
+            <Header email={isEmail} loggedIn={isLogin} login={setIsLogin} />
             <Routes>
-            <Route  path="/"  element ={<ProtectedRoute loggedIn={isLogin}
-                onEditProfile={handleEditProfileClick}
-                onEditAvatar={handleEditAvatarClick}
-                onAddPlace={handleAddPlaceClick}
-                onImg={handleCardClick}
-                onLike={handleCardLike}
-                onDelete={handleCardDelete}component={Main}
-                element ={<Main
-            
-              ></Main>}/>}/>
-              
-              <Route path='/sign-up' element ={isLogin ? <Navigate to="/" /> :<Register handleRegistr={handleRegistr} onRegistr={handleTokenCheck} />}/>
-              
-              <Route path='/sign-in' element={isLogin ? <Navigate to="/" /> :<Login onSignin={handleAutorizUser} onRegistr={handleTokenCheck}/>}/>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute
+                    loggedIn={isLogin}
+                    onEditProfile={handleEditProfileClick}
+                    onEditAvatar={handleEditAvatarClick}
+                    onAddPlace={handleAddPlaceClick}
+                    onImg={handleCardClick}
+                    onLike={handleCardLike}
+                    onDelete={handleCardDelete}
+                    component={Main}
+                    element={<Main></Main>}
+                  />
+                }
+              />
+
+              <Route
+                path="/sign-up"
+                element={
+                  isLogin ? (
+                    <Navigate to="/" />
+                  ) : (
+                    <Register
+                      handleRegistr={handleRegistr}
+                      onRegistr={handleTokenCheck}
+                    />
+                  )
+                }
+              />
+
+              <Route
+                path="/sign-in"
+                element={
+                  isLogin ? (
+                    <Navigate to="/" />
+                  ) : (
+                    <Login
+                      onSignin={handleAutorizUser}
+                      onRegistr={handleTokenCheck}
+                    />
+                  )
+                }
+              />
             </Routes>
-          
+
             <EditProfilePopup
               onUpdateUser={handleUpdateUser}
               isOpen={isEditProfilePopupOpen}
@@ -242,7 +279,11 @@ function App() {
               isOpen={isImagePopupOpen}
               closeAllPopups={closeAllPopups}
             />
-            <InfpToolTip isSuccess={isSuccess}  isFail={isFail} onClose={closeResponsePopup} />
+            <InfpToolTip
+              isSuccess={isSuccess}
+              isFail={isFail}
+              onClose={closeResponsePopup}
+            />
 
             <Footer />
           </CurrentCardsContext.Provider>

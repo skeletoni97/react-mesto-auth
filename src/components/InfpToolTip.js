@@ -3,10 +3,6 @@ import success from '../image/success.svg'
 import fail from '../image/Fail.svg'
 function InfpToolTip (props){
     
-
-  
-
-
 return (
     <div  className= { props.isSuccess ? "popup popup_opened" : props.isFail ? "popup popup_opened" : "popup" }>
         <div className="popup__container">

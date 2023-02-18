@@ -12,8 +12,6 @@ function Header(props) {
     navigate('/');
   };
 
-  console.log(props.email, "ff");
-
   return (
     <header className="header">
       <div className="header__logo"></div>

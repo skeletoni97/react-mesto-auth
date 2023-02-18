@@ -6,7 +6,6 @@ import { CurrentUserContext, CurrentCardsContext } from "../contexts/CurrentUser
 function Main(props) {
   const CurrentUser = React.useContext(CurrentUserContext);
   const cards = React.useContext(CurrentCardsContext);
-  console.log('ddd',props)
 
   return (
     <main className="content">
