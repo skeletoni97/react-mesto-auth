@@ -22,7 +22,6 @@ function EditProfilePopup(props) {
       setDescription(currentUser.about);
     },
     [currentUser],
-    props.isOpen
   );
 
   function handleSubmit(e) {

@@ -1,10 +1,10 @@
 import React from "react";
 import success from '../image/success.svg'
 import fail from '../image/Fail.svg'
-function InfpToolTip (props){
-    
+function InfoToolTip (props){
+    const isOpen = props.isSuccess || props.isFail
 return (
-    <div  className= { props.isSuccess ? "popup popup_opened" : props.isFail ? "popup popup_opened" : "popup" }>
+    <div  className= { isOpen ? "popup popup_opened" : "popup" }>
         <div className="popup__container">
             <div className="popup__content">
             <button onClick={props.onClose} type="button" className="popup__close popup__close-profile"/>
@@ -16,4 +16,4 @@ return (
 )
 }
 
-export default InfpToolTip
+export default InfoToolTip

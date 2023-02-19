@@ -25,7 +25,7 @@ import {
 } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
-import InfpToolTip from "./InfpToolTip";
+import InfoToolTip from "./InfpToolTip";
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
@@ -153,6 +153,7 @@ function App() {
       .then((res) => {
         localStorage.setItem("token", res.token);
         setIsLogin(true);
+        setIsEmail(email)
       })
       .catch((err) => {});
   }
@@ -201,12 +202,19 @@ function App() {
       setIsFail(false);
     }
   }
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    setIsLogin(false);
+    navigate('/');
+  };
+
   return (
     <>
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
           <CurrentCardsContext.Provider value={cards}>
-            <Header email={isEmail} loggedIn={isLogin} login={setIsLogin} />
+            <Header email={isEmail} loggedIn={isLogin} login={setIsLogin} handleSignOut={handleSignOut}/>
             <Routes>
               <Route
                 path="/"
@@ -233,7 +241,6 @@ function App() {
                   ) : (
                     <Register
                       handleRegistr={handleRegistr}
-                      onRegistr={handleTokenCheck}
                     />
                   )
                 }
@@ -247,7 +254,6 @@ function App() {
                   ) : (
                     <Login
                       onSignin={handleAutorizUser}
-                      onRegistr={handleTokenCheck}
                     />
                   )
                 }
@@ -279,7 +285,7 @@ function App() {
               isOpen={isImagePopupOpen}
               closeAllPopups={closeAllPopups}
             />
-            <InfpToolTip
+            <InfoToolTip
               isSuccess={isSuccess}
               isFail={isFail}
               onClose={closeResponsePopup}

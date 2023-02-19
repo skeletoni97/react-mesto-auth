@@ -6,11 +6,7 @@ function Header(props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSignOut = () => {
-    localStorage.removeItem('token');
-    props.login(false);
-    navigate('/');
-  };
+
 
   return (
     <header className="header">
@@ -18,16 +14,16 @@ function Header(props) {
       {props.loggedIn ? (
         <div className="header__nav">
           <p className="header__email">{props.email}</p>
-          <Link className="header__button" to="/sign-in" onClick={handleSignOut}>
+          <Link className="header__button" to="/sign-in" onClick={props.handleSignOut}>
             Выйти
           </Link>
         </div>
       ) : location.pathname === "/sign-up" ? (
-        <Link className="header__button" to="/sign-in" onClick={handleSignOut}>
+        <Link className="header__button" to="/sign-in" onClick={props.handleSignOut}>
           Войти
         </Link>
       ) : (
-        <Link className="header__button" to="/sign-up" onClick={handleSignOut}>
+        <Link className="header__button" to="/sign-up" onClick={props.handleSignOut}>
           Регистрация
         </Link>
       )}
